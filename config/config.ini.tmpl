@@ -1,0 +1,69 @@
+[app:main]
+use = egg:pypicloud
+
+pyramid.reload_templates = False
+pyramid.debug_authorization = false
+pyramid.debug_notfound = false
+pyramid.debug_routematch = false
+pyramid.default_locale_name = en
+
+pypi.default_read = authenticated
+
+pypi.storage = s3
+storage.aws_access_key_id = ${S3_ACCESS_KEY}
+storage.aws_secret_access_key = ${S3_SECRET_KEY}
+storage.bucket = ${S3_BUCKET_NAME}
+
+
+db.url = ${DATABASE_URL}
+
+pypi.auth = sql
+auth.db.url = ${DATABASE_URL}
+
+# For beaker
+session.encrypt_key = 6xOXE8+paR4U5leiChks03MgGzqeBLkil6QVWm+EUMU=
+session.validate_key = MlnlXdwGM055D2zl26/5CmihMt8LZ8/Yl9vZznwXTWo=
+session.secure = True
+session.invalidate_corrupt = true
+
+###
+# wsgi server configuration
+###
+
+[uwsgi]
+paste = config:%p
+paste-logger = %p
+master = true
+processes = ${UWSGI_PROCESSES:-20}
+reload-mercy = 15
+worker-reload-mercy = 15
+max-requests = 1000
+enable-threads = true
+http = 0.0.0.0:${PORT:-8080}
+
+
+###
+# logging configuration
+# http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/logging.html
+###
+
+[loggers]
+keys = root
+
+[handlers]
+keys = console
+
+[formatters]
+keys = generic
+
+[logger_root]
+level = WARN
+handlers = console
+
+[handler_console]
+class = StreamHandler
+level = NOTSET
+formatter = generic
+
+[formatter_generic]
+format = %(levelname)s %(asctime)s [%(name)s] %(message)s
